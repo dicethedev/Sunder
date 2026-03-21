@@ -1,0 +1,21 @@
+[package]
+name = "sunder-aggregator"
+version = "0.1.0"
+edition = "2024"
+description = "Sunder aggregator — fan-out, collect partial sigs, assemble threshold signature"
+
+[dependencies]
+sunder-core = { path = "../sunder-core" }
+axum = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+clap = { workspace = true }
+hex = { workspace = true }
+reqwest = { workspace = true }
+
+
+# Thetacrypt — needed for assemble() and SignatureShare::from_bytes()
+theta_schemes = { git = "https://github.com/dicethedev/thetacrypt", branch = "master" }

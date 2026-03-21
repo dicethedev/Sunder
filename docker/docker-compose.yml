@@ -1,0 +1,176 @@
+services:
+
+  # ── Aggregator ──────────────────────────────────────────────────────────────
+  # The public-facing API. Receives sign requests, fans out to nodes,
+  # assembles the threshold signature.
+  aggregator:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.aggregator
+    container_name: sunder-aggregator
+    ports:
+      - "8080:8080"
+    environment:
+      - SUNDER_KEYSTORE=/config/node1.keystore
+      - SUNDER_THRESHOLD=3
+      - SUNDER_NODES=http://node1:9000,http://node2:9000,http://node3:9000,http://node4:9000,http://node5:9000
+      - SUNDER_BIND=0.0.0.0:8080
+      - SUNDER_AUDIT_LOG=/var/log/sunder/aggregator-audit.jsonl
+      - RUST_LOG=info
+    volumes:
+      - ../config:/config:ro
+      - sunder-logs:/var/log/sunder
+    networks:
+      - sunder-net
+    depends_on:
+      - node1
+      - node2
+      - node3
+      - node4
+      - node5
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ── Node 1 ──────────────────────────────────────────────────────────────────
+  node1:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.node
+    container_name: sunder-node1
+    environment:
+      - SUNDER_KEYSTORE=/config/node1.keystore
+      - SUNDER_NODE_INDEX=1
+      - SUNDER_BIND=0.0.0.0:9000
+      - SUNDER_AUDIT_LOG=/var/log/sunder/node1-audit.jsonl
+      - RUST_LOG=info
+    volumes:
+      - ../config:/config:ro
+      - sunder-logs:/var/log/sunder
+    networks:
+      sunder-net:
+        aliases:
+          - node1
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ── Node 2 ──────────────────────────────────────────────────────────────────
+  node2:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.node
+    container_name: sunder-node2
+    environment:
+      - SUNDER_KEYSTORE=/config/node2.keystore
+      - SUNDER_NODE_INDEX=2
+      - SUNDER_BIND=0.0.0.0:9000
+      - SUNDER_AUDIT_LOG=/var/log/sunder/node2-audit.jsonl
+      - RUST_LOG=info
+    volumes:
+      - ../config:/config:ro
+      - sunder-logs:/var/log/sunder
+    networks:
+      sunder-net:
+        aliases:
+          - node2
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ── Node 3 ──────────────────────────────────────────────────────────────────
+  node3:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.node
+    container_name: sunder-node3
+    environment:
+      - SUNDER_KEYSTORE=/config/node3.keystore
+      - SUNDER_NODE_INDEX=3
+      - SUNDER_BIND=0.0.0.0:9000
+      - SUNDER_AUDIT_LOG=/var/log/sunder/node3-audit.jsonl
+      - RUST_LOG=info
+    volumes:
+      - ../config:/config:ro
+      - sunder-logs:/var/log/sunder
+    networks:
+      sunder-net:
+        aliases:
+          - node3
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ── Node 4 ──────────────────────────────────────────────────────────────────
+  node4:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.node
+    container_name: sunder-node4
+    environment:
+      - SUNDER_KEYSTORE=/config/node4.keystore
+      - SUNDER_NODE_INDEX=4
+      - SUNDER_BIND=0.0.0.0:9000
+      - SUNDER_AUDIT_LOG=/var/log/sunder/node4-audit.jsonl
+      - RUST_LOG=info
+    volumes:
+      - ../config:/config:ro
+      - sunder-logs:/var/log/sunder
+    networks:
+      sunder-net:
+        aliases:
+          - node4
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ── Node 5 ──────────────────────────────────────────────────────────────────
+  node5:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.node
+    container_name: sunder-node5
+    environment:
+      - SUNDER_KEYSTORE=/config/node5.keystore
+      - SUNDER_NODE_INDEX=5
+      - SUNDER_BIND=0.0.0.0:9000
+      - SUNDER_AUDIT_LOG=/var/log/sunder/node5-audit.jsonl
+      - RUST_LOG=info
+    volumes:
+      - ../config:/config:ro
+      - sunder-logs:/var/log/sunder
+    networks:
+      sunder-net:
+        aliases:
+          - node5
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+networks:
+  sunder-net:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.21.0.0/16
+
+volumes:
+  sunder-logs:

@@ -1,0 +1,12 @@
+[package]
+name = "sunder-client"
+version = "0.1.0"
+edition = "2024"
+description = "Sunder client SDK — integrate threshold signing in two lines of Rust"
+
+[dependencies]
+sunder-core = { path = "../../crates/sunder-core" }
+tokio = { workspace = true }
+reqwest = { workspace = true }
+serde_json = { workspace = true }
+hex = { workspace = true }

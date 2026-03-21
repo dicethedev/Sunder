@@ -1,0 +1,26 @@
+[package]
+name = "sunder-node"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "sunder-node"
+path = "src/main.rs"
+
+description = "Sunder signing node — holds a key share, produces partial signatures"
+ 
+[dependencies]
+sunder-core = { path = "../sunder-core" }
+axum = { workspace = true }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+clap = { workspace = true }
+hex = { workspace = true }
+
+
+# ── Thetacrypt ──────────────────────────────────────────────────────────────
+# Path is relative from crates/sunder-node/ to thetacrypt
+theta_schemes = { git = "https://github.com/dicethedev/thetacrypt", branch = "master" }

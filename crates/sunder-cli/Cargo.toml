@@ -1,0 +1,18 @@
+[package]
+name = "sunder-cli"
+version = "0.1.0"
+edition = "2024"
+description = "Sunder CLI — operator interface for the threshold signing cluster"
+
+[[bin]]
+name = "sunder"
+path = "src/main.rs"
+
+[dependencies]
+sunder-core = { path = "../sunder-core" }
+tokio = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+clap = { workspace = true }
+reqwest = { workspace = true }
+hex = { workspace = true }

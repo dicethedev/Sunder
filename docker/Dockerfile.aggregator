@@ -1,0 +1,33 @@
+# ── Stage 1: Build ───────────────────────────────────────────────────────────
+FROM rust:latest AS builder
+
+RUN apt-get update && apt-get install -y \
+    libssl-dev \
+    pkg-config \
+    libgmp-dev \
+    libmpfr-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY . .
+
+RUN RUSTFLAGS="--allow dangerous_implicit_autorefs --allow legacy_derive_helpers" \
+    cargo build --release -p sunder-aggregator
+
+# ── Stage 2: Runtime ─────────────────────────────────────────────────────────
+FROM debian:trixie-slim
+
+RUN apt-get update && apt-get install -y \
+    libssl3 \
+    libgmp10 \
+    libmpfr6 \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir -p /var/log/sunder
+
+COPY --from=builder /app/target/release/sunder-aggregator /usr/local/bin/sunder-aggregator
+
+EXPOSE 8080
+
+ENTRYPOINT ["sunder-aggregator"]

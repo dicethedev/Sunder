@@ -1,0 +1,7 @@
+/target
+config/
+!config/.gitkeep
+*.keystore
+*.jsonl
+Cargo.lock
+.env

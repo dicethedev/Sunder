@@ -1,0 +1,14 @@
+[package]
+name = "sunder-core"
+version = "0.1.0"
+edition = "2024"
+
+description = "Core types and traits for Sunder threshold signing infrastructure"
+ 
+[dependencies]
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+hex = { workspace = true }
+tokio = { workspace = true }
+ 

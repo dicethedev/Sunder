@@ -1,0 +1,39 @@
+# ── Stage 1: Build ───────────────────────────────────────────────────────────
+FROM rust:latest AS builder
+
+# Install build dependencies
+RUN apt-get update && apt-get install -y \
+    libssl-dev \
+    pkg-config \
+    libgmp-dev \
+    libmpfr-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Copy workspace
+COPY . .
+
+# Build sunder-node
+# RUSTFLAGS suppresses thetacrypt lint issues on newer Rust
+RUN RUSTFLAGS="--allow dangerous_implicit_autorefs --allow legacy_derive_helpers" \
+    cargo build --release -p sunder-node
+
+# ── Stage 2: Runtime ─────────────────────────────────────────────────────────
+FROM debian:trixie-slim
+
+RUN apt-get update && apt-get install -y \
+    libssl3 \
+    libgmp10 \
+    libmpfr6 \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create log directory
+RUN mkdir -p /var/log/sunder
+
+COPY --from=builder /app/target/release/sunder-node /usr/local/bin/sunder-node
+
+EXPOSE 9000
+
+ENTRYPOINT ["sunder-node"]
