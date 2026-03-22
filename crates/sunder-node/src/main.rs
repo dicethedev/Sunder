@@ -1,9 +1,11 @@
-use axum::{Router, routing::{get, post}};
+use axum::{
+    Router,
+    routing::{get, post},
+};
 use clap::Parser;
 use std::sync::Arc;
-use node_signer::NodeSigner;
-use handler::{health, list_keys, partial_sign};
-use sunder_core::audit::{AuditLog, AuditEvent};
+use sunder_core::audit::{AuditEvent, AuditLog};
+use sunder_node::{AppState, handler, node_signer::NodeSigner};
 
 #[derive(Parser, Debug)]
 #[command(
@@ -24,13 +26,12 @@ pub struct Args {
     pub bind: String,
 
     /// Path to audit log file
-    #[arg(long, default_value = "/var/log/sunder/node-audit.jsonl", env = "SUNDER_AUDIT_LOG")]
+    #[arg(
+        long,
+        default_value = "/var/log/sunder/node-audit.jsonl",
+        env = "SUNDER_AUDIT_LOG"
+    )]
     pub audit_log: String,
-}
-
-pub struct AppState {
-    pub signer: NodeSigner,
-    pub audit: AuditLog,
 }
 
 #[tokio::main]
@@ -38,7 +39,7 @@ async fn main() {
     tracing_subscriber::fmt()
         .with_env_filter(
             tracing_subscriber::EnvFilter::from_default_env()
-                .add_directive("sunder_node=info".parse().unwrap())
+                .add_directive("sunder_node=info".parse().unwrap()),
         )
         .init();
 
@@ -51,11 +52,10 @@ async fn main() {
 
     let audit = AuditLog::new(&args.audit_log);
 
-    let signer = NodeSigner::load(&args.keystore, args.node_index)
-        .unwrap_or_else(|e| {
-            tracing::error!("failed to load keystore '{}': {}", args.keystore, e);
-            std::process::exit(1);
-        });
+    let signer = NodeSigner::load(&args.keystore, args.node_index).unwrap_or_else(|e| {
+        tracing::error!("failed to load keystore '{}': {}", args.keystore, e);
+        std::process::exit(1);
+    });
 
     // Log all loaded keys to audit
     for key_info in signer.list_keys() {
@@ -85,10 +85,7 @@ async fn main() {
             std::process::exit(1);
         });
 
-    tracing::info!(
-        "🟢 sunder-node {} ready on {}",
-        args.node_index, args.bind
-    );
+    tracing::info!("🟢 sunder-node {} ready on {}", args.node_index, args.bind);
 
     axum::serve(listener, app).await.unwrap();
 }

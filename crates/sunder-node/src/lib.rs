@@ -1,3 +1,10 @@
 pub mod handler;
 pub mod node_signer;
-pub mod main;
+
+use node_signer::NodeSigner;
+use sunder_core::audit::AuditLog;
+
+pub struct AppState {
+    pub signer: NodeSigner,
+    pub audit: AuditLog,
+}

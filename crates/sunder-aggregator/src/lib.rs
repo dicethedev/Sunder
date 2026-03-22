@@ -1,3 +1,10 @@
-pub mod handlers;
+pub mod handler;
 pub mod assembler;
-pub mod main;
+
+use assembler::SunderAssembler;
+use sunder_core::audit::AuditLog;
+
+pub struct AppState {
+    pub assembler: SunderAssembler,
+    pub audit: AuditLog,
+}
