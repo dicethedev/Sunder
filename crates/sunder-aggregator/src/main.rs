@@ -1,8 +1,9 @@
 use axum::{Router, routing::{get, post}};
 use clap::Parser;
 use std::sync::Arc;
-use assembler::SunderAssembler;
-use handler::{health, list_keys, sign, verify};
+use sunder_aggregator::AppState;
+use sunder_aggregator::assembler::SunderAssembler;
+use sunder_aggregator::handler;
 use sunder_core::audit::AuditLog;
 
 #[derive(Parser, Debug)]
@@ -46,11 +47,6 @@ pub struct Args {
         env = "SUNDER_AUDIT_LOG"
     )]
     pub audit_log: String,
-}
-
-pub struct AppState {
-    pub assembler: SunderAssembler,
-    pub audit: AuditLog,
 }
 
 #[tokio::main]

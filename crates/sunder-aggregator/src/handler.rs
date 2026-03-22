@@ -5,17 +5,15 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
-use sunder_core::{
-    audit::AuditEvent,
-    types::{CombinedSigResponse, HealthResponse, KeyInfo, SignRequest},
-};
-use crate::AppState;
+use sunder_core::types::{CombinedSigResponse, HealthResponse, KeyInfo, SignRequest};
+use sunder_core::audit::AuditEvent;
+use super::AppState;
 
 pub async fn health(State(state): State<Arc<AppState>>) -> Json<HealthResponse> {
     Json(HealthResponse {
         status: "ok".to_string(),
         node_index: None,
-        keys_loaded: state.assembler.public_keys.len(),
+        keys_loaded: state.assembler.key_count(),
     })
 }
 

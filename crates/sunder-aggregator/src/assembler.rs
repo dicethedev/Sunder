@@ -70,6 +70,10 @@ impl SunderAssembler {
         })
     }
 
+    pub fn key_count(&self) -> usize {
+        self.public_keys.len()
+    }
+
     /// Fan out to all nodes, collect threshold partial sigs, assemble final signature
     pub async fn sign(
         &self,
