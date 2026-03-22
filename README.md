@@ -17,28 +17,9 @@ When a message is signed through Sunder:
 - Compromise one node → you learn nothing about the key
 - Take down `N - T` nodes → signing still works
 
-```
-Your App
-   │
-   │  POST /v1/sign/bridge-signer
-   ▼
-┌──────────────────────────────────────────┐
-│  sunder-aggregator                        │
-│  Fans out to all nodes in parallel       │
-└──────┬──────────┬──────────┬─────────────┘
-       ▼          ▼          ▼
-  ┌─────────┐ ┌─────────┐ ┌─────────┐  ...
-  │ node 1  │ │ node 2  │ │ node 3  │
-  │ share_1 │ │ share_2 │ │ share_3 │
-  └─────────┘ └─────────┘ └─────────┘
-       │          │          │
-       └──────────┴──────────┘
-                  │
-           combine(t partial sigs)
-                  │
-           ✅ Valid Signature
-           (full key never existed)
-```
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/f495cb7d-d8c5-4941-9e08-a0ca51ce5510" />
+</p>
 
 ---
 
