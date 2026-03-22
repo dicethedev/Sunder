@@ -17,9 +17,99 @@ When a message is signed through Sunder:
 - Compromise one node → you learn nothing about the key
 - Take down `N - T` nodes → signing still works
 
-<p align="center">
+## Architecture
+This visual diagram depicting Sunder's layered system components work (showing how Sunder signing system works)
+
+```mermaid
+flowchart LR
+
+    %% ===== CLIENT =====
+    subgraph CLIENT["Client Layer"]
+        APP["Your Application<br/><small>Bridge · Oracle · DAO · Validator</small>"]
+    end
+
+    %% ===== AGGREGATOR =====
+    subgraph AGG_LAYER["Coordinator Layer"]
+        AGG["sunder-aggregator<br/><small>Auth · Key Registry · Fan-out · Threshold Logic · Audit Log</small>"]
+    end
+
+    %% ===== NODES =====
+    subgraph NODES["Signing Nodes (t-of-n Threshold)"]
+        N1["Node 1<br/><small>share_1</small>"]
+        N2["Node 2<br/><small>share_2</small>"]
+        N3["Node 3<br/><small>share_3</small>"]
+        N4["Node 4<br/><small>share_4</small>"]
+        N5["Node 5 ❌<br/><small>offline</small>"]
+    end
+
+    %% ===== AGGREGATION =====
+    subgraph COMPUTE["Cryptographic Execution"]
+        AGGREGATE["Signature Aggregation<br/><small>ThresholdSignature::assemble()</small>"]
+    end
+
+    %% ===== RESPONSE =====
+    subgraph OUTPUT["Result"]
+        RESP["Response<br/><small>{ signature, nodes_participated }</small><br/>🔐 Full key never existed"]
+    end
+
+    %% ===== FLOW =====
+    APP -->|"POST /v1/sign/{key}"| AGG
+
+    AGG -->|fan-out request| N1
+    AGG -->|fan-out request| N2
+    AGG -->|fan-out request| N3
+    AGG -->|fan-out request| N4
+    AGG -.->|unreachable| N5
+
+    N1 -->|partial signature| AGGREGATE
+    N2 -->|partial signature| AGGREGATE
+    N3 -->|partial signature| AGGREGATE
+    N4 -->|partial signature| AGGREGATE
+
+    AGGREGATE -->|final signature| RESP
+    RESP --> AGG
+
+    %% ===== STYLING =====
+    classDef client fill:#E3F2FD,stroke:#1E88E5,stroke-width:2px,color:#0D47A1;
+    classDef aggregator fill:#FFF3E0,stroke:#FB8C00,stroke-width:2px,color:#E65100;
+    classDef nodes fill:#E8F5E9,stroke:#43A047,stroke-width:2px,color:#1B5E20;
+    classDef offline fill:#FFEBEE,stroke:#E53935,stroke-width:2px,stroke-dasharray: 6 4,color:#B71C1C;
+    classDef compute fill:#FFFDE7,stroke:#FDD835,stroke-width:2px,color:#F57F17;
+    classDef output fill:#ECEFF1,stroke:#546E7A,stroke-width:2px,color:#263238;
+
+    class APP client;
+    class AGG aggregator;
+    class N1,N2,N3,N4 nodes;
+    class N5 offline;
+    class AGGREGATE compute;
+    class RESP output;
+```
+
+<!-- <p align="center">
   <img src="https://github.com/user-attachments/assets/f495cb7d-d8c5-4941-9e08-a0ca51ce5510" />
-</p>
+</p> -->
+
+## Project Structure
+
+Sunder is organized as a modular, multi-crate Rust workspace designed for distributed threshold signing.
+
+```
+sunder/
+├── crates/
+│   ├── sunder-core/        # Shared types, errors, audit log
+│   ├── sunder-node/        # Signing node — holds one key share
+│   ├── sunder-aggregator/  # Fan-out, collect, assemble
+│   └── sunder-cli/         # Operator CLI
+├── sdk/
+│   └── sunder-client/      # Rust SDK for application integration
+├── docker/
+│   ├── Dockerfile.node
+│   ├── Dockerfile.aggregator
+│   └── docker-compose.yml
+└── scripts/
+    ├── setup.sh            # One-time key generation
+    └── demo.sh             # Fault tolerance demo
+```
 
 ---
 
@@ -244,26 +334,6 @@ Returns:
 ```
 
 ---
-
-## Architecture
-
-```
-sunder/
-├── crates/
-│   ├── sunder-core/        # Shared types, errors, audit log
-│   ├── sunder-node/        # Signing node — holds one key share
-│   ├── sunder-aggregator/  # Fan-out, collect, assemble
-│   └── sunder-cli/         # Operator CLI
-├── sdk/
-│   └── sunder-client/      # Rust SDK for application integration
-├── docker/
-│   ├── Dockerfile.node
-│   ├── Dockerfile.aggregator
-│   └── docker-compose.yml
-└── scripts/
-    ├── setup.sh            # One-time key generation
-    └── demo.sh             # Fault tolerance demo
-```
 
 ### The cryptographic path
 
