@@ -3,7 +3,7 @@
 **Self-hosted threshold signing infrastructure.**  
 The key is split. It never comes back together.
 
-> 📊 **[Pitch Deck](https://docs.google.com/presentation/d/1Hm575VoYnOfTAo0Y2qwCit9xqyDP5z7G1SMIdpEUkiY/edit?usp=sharing)** · 🎥 **[Demo Video](https://your-demo-video-link)**
+> 📊 **[Pitch Deck](https://docs.google.com/presentation/d/1Hm575VoYnOfTAo0Y2qwCit9xqyDP5z7G1SMIdpEUkiY/edit?usp=sharing)** · 🎥 **[Demo Video](https://drive.google.com/file/d/17k8N2s5_oqzNQxdvj6gI88pHF6cqAR83/view?usp=sharing)**
 
 ---
 
